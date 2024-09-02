@@ -2,10 +2,12 @@ import requests
 import pandas as pd
 from dune_client.client import DuneClient
 import matplotlib.pyplot as plt
+from config import DUNE_API_KEY  
+from utils import convert_and_format_timestamp  
 
 def main():
     # Initialize the Dune client with your API key
-    dune = DuneClient("3QM48n5GsHs5KZpneRb87uY3mywzlGjn")
+    dune = DuneClient(DUNE_API_KEY)
     merged_df = merge_gmx_data()
     print(merged_df)
 
@@ -48,16 +50,10 @@ def merge_gmx_data():
     staking_df = staking_df[['timestamp', 'bonded_supply']]
     apy_df = apy_df[['timestamp', 'apr']]
 
-    price_df['timestamp'] = pd.to_datetime(price_df['timestamp'], utc=True)
-    supply_df['timestamp'] = pd.to_datetime(supply_df['timestamp'], utc=True)
-    staking_df['timestamp'] = pd.to_datetime(staking_df['timestamp'], utc=True)
-    apy_df['timestamp'] = pd.to_datetime(apy_df['timestamp'], utc=True)
-
-    # Format timestamp columns to exclude seconds and timezone
-    price_df['timestamp'] = price_df['timestamp'].dt.strftime('%Y-%m-%d')
-    supply_df['timestamp'] = supply_df['timestamp'].dt.strftime('%Y-%m-%d')
-    staking_df['timestamp'] = staking_df['timestamp'].dt.strftime('%Y-%m-%d')
-    apy_df['timestamp'] = apy_df['timestamp'].dt.strftime('%Y-%m-%d')
+    price_df = convert_and_format_timestamp(price_df, 'timestamp')
+    supply_df = convert_and_format_timestamp(supply_df, 'timestamp')
+    staking_df = convert_and_format_timestamp(staking_df, 'timestamp')
+    apy_df = convert_and_format_timestamp(apy_df, 'timestamp')
 
     merged_df = price_df.merge(supply_df, on='timestamp', how='outer') \
                         .merge(staking_df, on='timestamp', how='outer') \

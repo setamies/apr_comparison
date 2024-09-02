@@ -2,10 +2,12 @@ import requests
 import pandas as pd
 from dune_client.client import DuneClient
 import matplotlib.pyplot as plt
+from utils import convert_and_format_timestamp
+from config import DUNE_API_KEY  
 
 def main():
     # Initialize the Dune client with your API key
-    dune = DuneClient("3QM48n5GsHs5KZpneRb87uY3mywzlGjn")
+    dune = DuneClient(DUNE_API_KEY)
     merged_df = merge_crv_data()
     print(merged_df)
 
@@ -54,14 +56,9 @@ def merge_crv_data():
     apy_df['apr'] = (apy_df['apr'] / 1200) * 365
 
     # Convert timestamp columns to datetime
-    price_df['timestamp'] = pd.to_datetime(price_df['timestamp'], utc=True)
-    supply_df['timestamp'] = pd.to_datetime(supply_df['timestamp'], utc=True)
-    apy_df['timestamp'] = pd.to_datetime(apy_df['timestamp'], utc=True)
-
-    # Format timestamp columns to exclude seconds and timezone
-    price_df['timestamp'] = price_df['timestamp'].dt.strftime('%Y-%m-%d')
-    supply_df['timestamp'] = supply_df['timestamp'].dt.strftime('%Y-%m-%d')
-    apy_df['timestamp'] = apy_df['timestamp'].dt.strftime('%Y-%m-%d')
+    price_df = convert_and_format_timestamp(price_df, 'timestamp')
+    supply_df = convert_and_format_timestamp(supply_df, 'timestamp')
+    apy_df = convert_and_format_timestamp(apy_df, 'timestamp')
 
     # Merge the dataframes on the 'timestamp' column
     merged_df = price_df.merge(supply_df, on='timestamp', how='outer') \

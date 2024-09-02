@@ -2,10 +2,12 @@ import requests
 import pandas as pd
 from dune_client.client import DuneClient
 import matplotlib.pyplot as plt
+from config import DUNE_API_KEY  
+from utils import convert_and_format_timestamp  
 
 def main():
     # Initialize the Dune client with your API key
-    dune = DuneClient("3QM48n5GsHs5KZpneRb87uY3mywzlGjn")
+    dune = DuneClient(DUNE_API_KEY)
     merged_df = merge_bal_data()
     print(merged_df)
 
@@ -49,26 +51,19 @@ def merge_bal_data():
     supply_df = supply_df.sort_values(by='timestamp', ascending=True)
     supply_df['daily_inflation_rate'] = supply_df['total_supply'].pct_change()
 
-    # Convert timestamp columns to datetime
-    price_df['timestamp'] = pd.to_datetime(price_df['timestamp'], utc=True)
-    supply_df['timestamp'] = pd.to_datetime(supply_df['timestamp'], utc=True)
-    apr_df['timestamp'] = pd.to_datetime(apr_df['timestamp'], utc=True)
-
-    price_df['timestamp'] = price_df['timestamp'].dt.strftime('%Y-%m-%d')
-    supply_df['timestamp'] = supply_df['timestamp'].dt.strftime('%Y-%m-%d')
-    apr_df['timestamp'] = apr_df['timestamp'].dt.strftime('%Y-%m-%d')
+    price_df = convert_and_format_timestamp(price_df, 'timestamp')
+    supply_df = convert_and_format_timestamp(supply_df, 'timestamp')
+    apr_df = convert_and_format_timestamp(apr_df, 'timestamp')
 
     # Merge the dataframes
     merged_df = pd.merge(price_df, supply_df, on='timestamp', how='outer') \
                   .merge(apr_df, on='timestamp', how='outer')
-
 
     merged_df = merged_df.sort_values(by='timestamp', ascending=True)
     merged_df.set_index('timestamp', inplace=True)
     merged_df['has_liquid_staking'] = False
 
     return merged_df.dropna()
-
 
 if __name__ == "__main__":
     main()
