@@ -6,7 +6,6 @@ from config import DUNE_API_KEY
 from utils import convert_and_format_timestamp  
 
 def main():
-    # Initialize the Dune client with your API key
     dune = DuneClient(DUNE_API_KEY)
     merged_df = merge_bal_data()
     print(merged_df)
@@ -18,24 +17,19 @@ def save_dune_query_to_csv(dune, query_id, filename):
     df.to_csv(filename, index=False)
 
 def fetch_bal_prices(dune):
-    save_dune_query_to_csv(dune, 3931901, 'bal/daily_price_data.csv')
+    save_dune_query_to_csv(dune, 3931901, 'data/bal/daily_price_data.csv')
 
 def fetch_bal_supply(dune):
-    save_dune_query_to_csv(dune, 543807, 'bal/supply_data.csv')
+    save_dune_query_to_csv(dune, 543807, 'data/bal/supply_data.csv')
 
 def fetch_bal_apr(dune):
-    save_dune_query_to_csv(dune, 3939002, 'bal/apr_data.csv')
+    save_dune_query_to_csv(dune, 3939002, 'data/bal/apr_data.csv')
 
 def merge_bal_data():
-    '''
-    Returns a dataframe with the Balancer (BAL) data.
-    '''
-    # Load the data from CSV files
-    price_df = pd.read_csv('bal/daily_price_data.csv').drop_duplicates()
-    supply_df = pd.read_csv('bal/supply_data.csv').drop_duplicates()
-    apr_df = pd.read_csv('bal/apr_data.csv').drop_duplicates()
+    price_df = pd.read_csv('data/bal/daily_price_data.csv').drop_duplicates()
+    supply_df = pd.read_csv('data/bal/supply_data.csv').drop_duplicates()
+    apr_df = pd.read_csv('data/bal/apr_data.csv').drop_duplicates()
 
-    # Rename columns as per the previous discussion
     price_df = price_df.rename(columns={'time': 'timestamp', 'avg_price': 'price'})
     supply_df = supply_df.rename(columns={
         'day': 'timestamp',
@@ -47,7 +41,6 @@ def merge_bal_data():
     supply_df['circ_supply'] = supply_df['total_supply'] - supply_df['bonded_supply']
     supply_df = supply_df[['timestamp', 'total_supply', 'circ_supply', 'bonded_supply', 'bonded_percent']]
 
-    # Calculate the daily inflation rate
     supply_df = supply_df.sort_values(by='timestamp', ascending=True)
     supply_df['daily_inflation_rate'] = supply_df['total_supply'].pct_change()
 
@@ -55,7 +48,6 @@ def merge_bal_data():
     supply_df = convert_and_format_timestamp(supply_df, 'timestamp')
     apr_df = convert_and_format_timestamp(apr_df, 'timestamp')
 
-    # Merge the dataframes
     merged_df = pd.merge(price_df, supply_df, on='timestamp', how='outer') \
                   .merge(apr_df, on='timestamp', how='outer')
 

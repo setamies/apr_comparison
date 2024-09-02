@@ -17,27 +17,14 @@ def fetch_coinmarketcap_data():
     return osmo_data_df
 
 def calculate_bonded_tokens(bonded_percent: np.ndarray, circulating_supply: np.ndarray) -> np.ndarray:
-    """
-    Calculate the number of bonded tokens based on bonded percentage and circulating supply.
-
-    Args:
-        bonded_percent (np.ndarray): Array of bonded percentages (as floats).
-        circulating_supply (np.ndarray): Array of circulating supply values.
-
-    Returns:
-        np.ndarray: Array of bonded tokens (as integers), with NaN for missing data.
-    """
-    # Make sure calculations are only done when both arrays contain values
     valid_mask = ~np.isnan(bonded_percent) & ~np.isnan(circulating_supply)
     result = np.full(bonded_percent.shape, np.nan)
     result[valid_mask] = np.round(bonded_percent[valid_mask] * circulating_supply[valid_mask]).astype(int)
-    
     return result
-    
 
 def merge_osmosis_data():
-    bonded_percentage = read_csv_with_date('osmosis/osmosis_bonded_percentage.csv', ['date', 'bonded_percent'])
-    staking_apr = read_csv_with_date('osmosis/osmosis_staking_apr.csv', ['date', 'apr'])
+    bonded_percentage = read_csv_with_date('data/osmosis/osmosis_bonded_percentage.csv', ['date', 'bonded_percent'])
+    staking_apr = read_csv_with_date('data/osmosis/osmosis_staking_apr.csv', ['date', 'apr'])
     circulating_supply_and_price = fetch_coinmarketcap_data()
 
     dfs = [bonded_percentage, staking_apr, circulating_supply_and_price]
@@ -52,5 +39,5 @@ def merge_osmosis_data():
 
 if __name__ == "__main__":
     merged_data = merge_osmosis_data()
-    merged_data.to_csv('osmosis/osmosis_data.csv', index=False)
-    print("Data merged and saved to osmosis/osmosis_data.csv")
+    merged_data.to_csv('data/osmosis/osmosis_data.csv', index=False)
+    print("Data merged and saved to data/osmosis/osmosis_data.csv")

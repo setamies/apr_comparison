@@ -1,7 +1,6 @@
 import pandas as pd
 from functools import reduce
 from utils import fetch_historical_quotes, create_df_from_coinmarketcap_data, store_data_in_csv, convert_percent_columns
-
 from config import TIME_START, TIME_END, INTERVAL, COINMARKETCAP_API_KEY, ATOM_ID
 
 def read_csv_with_date(file_path, column_names):
@@ -17,11 +16,11 @@ def fetch_coinmarketcap_data():
     return atom_data_df
 
 def merge_atom_data():
-    bonded_tokens = read_csv_with_date('atom/atom_bonded_tokens.csv', ['date', 'bonded_supply'])
+    bonded_tokens = read_csv_with_date('data/atom/atom_bonded_tokens.csv', ['date', 'bonded_supply'])
     bonded_tokens['bonded_supply'] = bonded_tokens['bonded_supply'].str.replace(',', '').astype(int)
-    inflation = read_csv_with_date('atom/atom_inflation.csv', ['date', 'inflation'])
-    apr = read_csv_with_date('atom/atom_staking_apr.csv', ['date', 'staking_apr'])
-    bonded_percent = read_csv_with_date('atom/atom_bonded_percent.csv', ['date', 'bonded_percent'])
+    inflation = read_csv_with_date('data/atom/atom_inflation.csv', ['date', 'inflation'])
+    apr = read_csv_with_date('data/atom/atom_staking_apr.csv', ['date', 'staking_apr'])
+    bonded_percent = read_csv_with_date('data/atom/atom_bonded_percent.csv', ['date', 'bonded_percent'])
     circulating_supply_and_price = fetch_coinmarketcap_data()
     
     data_frames = [bonded_tokens, inflation, apr, bonded_percent, circulating_supply_and_price]
@@ -35,5 +34,5 @@ def merge_atom_data():
 
 if __name__ == "__main__":
     merged_data = merge_atom_data()
-    store_data_in_csv(merged_data, 'atom_data.csv')
-    print("Data merged and saved to atom/atom_data.csv")
+    store_data_in_csv(merged_data, 'data/atom/atom_data.csv')
+    print("Data merged and saved to data/atom/atom_data.csv")

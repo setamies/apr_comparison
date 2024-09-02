@@ -1,22 +1,12 @@
 import pandas as pd
-from typing import Dict, List
-from osmosis import merge_osmosis_data
-from atom import merge_atom_data
-from dydx import merge_dydx_data
-from curve import merge_crv_data
-from gmx import merge_gmx_data
-from balancer import merge_bal_data
-
-RENAME_DICT: Dict[str, str] = {
-    'bonded_percent': 'bonded_percentage',
-    'staking_apr': 'apr',
-    'circulating_supply': 'circ_supply',
-    'bonded_supply': 'bonded_tokens',
-    'total_tokens': 'bonded_tokens',
-    'percentage_bonded': 'bonded_percentage',
-    'timestamp': 'date',  
-    'daily_inflation_rate': 'inflation'
-}
+from typing import Dict
+from config import RENAME_DICT
+from data_sources.atom import merge_atom_data
+from data_sources.osmosis import merge_osmosis_data
+from data_sources.dydx import merge_dydx_data
+from data_sources.curve import merge_crv_data
+from data_sources.gmx import merge_gmx_data
+from data_sources.balancer import merge_bal_data
 
 def standardize_columns(df: pd.DataFrame, rename_dict: Dict[str, str]) -> pd.DataFrame:
     """Standardize column names in the DataFrame."""
@@ -65,19 +55,10 @@ def merge_all_data() -> pd.DataFrame:
     return merged_data
 
 if __name__ == "__main__":
-    dataframes = {
-        'Osmosis': merge_osmosis_data(),
-        'Atom': merge_atom_data(),
-        'dYdX': merge_dydx_data(),
-        'Curve': merge_crv_data(),
-        'GMX': merge_gmx_data(),
-        'Balancer': merge_bal_data()
-    }
-
     merged_data = merge_all_data()
-    merged_data.to_csv('all_chains_data.csv', index=False)
+    merged_data.to_csv('data/all_chains_data.csv', index=False)
     
-    print("\nMerged data saved to 'all_chains_data.csv'")
+    print("\nMerged data saved to 'data/all_chains_data.csv'")
     print("\nDescriptive statistics of merged data:")
     print(merged_data.describe(include='all'))
     print("\nMissing values in merged data:")

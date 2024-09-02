@@ -6,7 +6,6 @@ from config import DUNE_API_KEY
 from utils import convert_and_format_timestamp  
 
 def main():
-    # Initialize the Dune client with your API key
     dune = DuneClient(DUNE_API_KEY)
     merged_df = merge_gmx_data()
     print(merged_df)
@@ -18,25 +17,25 @@ def save_dune_query_to_csv(dune, query_id, filename):
     df.to_csv(filename, index=False)
 
 def fetch_glp_data(dune):
-    save_dune_query_to_csv(dune, 1066775, 'gmx/glp_data.csv')
+    save_dune_query_to_csv(dune, 1066775, 'data/gmx/glp_data.csv')
 
 def fetch_gmx_supply(dune):
-    save_dune_query_to_csv(dune, 1108993, 'gmx/supply_data.csv')
+    save_dune_query_to_csv(dune, 1108993, 'data/gmx/supply_data.csv')
 
 def fetch_gmx_price(dune):
-    save_dune_query_to_csv(dune, 3997647, 'gmx/price_data.csv')
+    save_dune_query_to_csv(dune, 3997647, 'data/gmx/price_data.csv')
 
 def fetch_gmx_staking(dune):
-    save_dune_query_to_csv(dune, 1036839, 'gmx/staking_data.csv')
+    save_dune_query_to_csv(dune, 1036839, 'data/gmx/staking_data.csv')
 
 def fetch_gmx_apy(dune):
-    save_dune_query_to_csv(dune, 2657814, 'gmx/apy_data.csv')
+    save_dune_query_to_csv(dune, 2657814, 'data/gmx/apy_data.csv')
 
 def merge_gmx_data():
-    supply_df = pd.read_csv('gmx/supply_data.csv')
-    price_df = pd.read_csv('gmx/price_data.csv')
-    staking_df = pd.read_csv('gmx/staking_data.csv')
-    apy_df = pd.read_csv('gmx/apy_data.csv')
+    supply_df = pd.read_csv('data/gmx/supply_data.csv')
+    price_df = pd.read_csv('data/gmx/price_data.csv')
+    staking_df = pd.read_csv('data/gmx/staking_data.csv')
+    apy_df = pd.read_csv('data/gmx/apy_data.csv')
 
     staking_df['bonded_supply'] = staking_df['gmx_s_total'] - staking_df['gmx_u_total']
 
